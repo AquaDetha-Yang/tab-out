@@ -492,13 +492,140 @@ function timeAgo(dateStr) {
 }
 
 /**
- * getGreeting() — "Good morning / afternoon / evening"
+ * Daily Quotes — Short, profound, inspirational quotes from notable figures.
+ * Rotates based on the day of the year so you get a fresh quote each day.
+ */
+const DAILY_QUOTES = [
+  { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+  { text: "Be the change you wish to see in the world.", author: "Mahatma Gandhi" },
+  { text: "What we think, we become.", author: "Buddha" },
+  { text: "Act as if what you do makes a difference. It does.", author: "William James" },
+  { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+  { text: "It always seems impossible until it's done.", author: "Nelson Mandela" },
+  { text: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+  { text: "Everything you've ever wanted is on the other side of fear.", author: "George Addair" },
+  { text: "Hardships often prepare ordinary people for an extraordinary destiny.", author: "C.S. Lewis" },
+  { text: "The journey of a thousand miles begins with one step.", author: "Lao Tzu" },
+  { text: "Your time is limited, don't waste it living someone else's life.", author: "Steve Jobs" },
+  { text: "Happiness depends upon ourselves.", author: "Aristotle" },
+  { text: "Turn your wounds into wisdom.", author: "Oprah Winfrey" },
+  { text: "Do what you can, with what you have, where you are.", author: "Theodore Roosevelt" },
+  { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+  { text: "We become what we think about.", author: "Earl Nightingale" },
+  { text: "An unexamined life is not worth living.", author: "Socrates" },
+  { text: "The mind is everything. What you think you become.", author: "Buddha" },
+  { text: "Strive not to be a success, but rather to be of value.", author: "Albert Einstein" },
+  { text: "Two roads diverged in a wood, and I took the one less traveled by.", author: "Robert Frost" },
+  { text: "I have not failed. I've just found 10,000 ways that won't work.", author: "Thomas Edison" },
+  { text: "What lies behind us and what lies before us are tiny matters compared to what lies within us.", author: "Ralph Waldo Emerson" },
+  { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+  { text: "The only limit to our realization of tomorrow will be our doubts of today.", author: "Franklin D. Roosevelt" },
+  { text: "Do not go where the path may lead, go instead where there is no path and leave a trail.", author: "Ralph Waldo Emerson" },
+  { text: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+  { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
+  { text: "Life is what happens when you're busy making other plans.", author: "John Lennon" },
+  { text: "The purpose of our lives is to be happy.", author: "Dalai Lama" },
+  { text: "Get busy living, or get busy dying.", author: "Stephen King" },
+  { text: "You miss 100% of the shots you don't take.", author: "Wayne Gretzky" },
+  { text: "Whether you think you can or you think you can't, you're right.", author: "Henry Ford" },
+  { text: "I have learned over the years that when one's mind is made up, this diminishes fear.", author: "Rosa Parks" },
+  { text: "I alone cannot change the world, but I can cast a stone across the water to create many ripples.", author: "Mother Teresa" },
+  { text: "Whatever you are, be a good one.", author: "Abraham Lincoln" },
+  { text: "If you tell the truth, you don't have to remember anything.", author: "Mark Twain" },
+  { text: "The most common way people give up their power is by thinking they don't have any.", author: "Alice Walker" },
+  { text: "Life isn't about finding yourself. Life is about creating yourself.", author: "George Bernard Shaw" },
+  { text: "The greatest glory in living lies not in never falling, but in rising every time we fall.", author: "Nelson Mandela" },
+  { text: "The way to get started is to quit talking and begin doing.", author: "Walt Disney" },
+  { text: "If life were predictable it would cease to be life, and be without flavor.", author: "Eleanor Roosevelt" },
+  { text: "Life is never fair, and perhaps it is a good thing for most of us that it is not.", author: "Oscar Wilde" },
+  { text: "The only impossible journey is the one you never begin.", author: "Tony Robbins" },
+  { text: "In this life we cannot do great things. We can only do small things with great love.", author: "Mother Teresa" },
+  { text: "Only a life lived for others is a life worthwhile.", author: "Albert Einstein" },
+  { text: "You only live once, but if you do it right, once is enough.", author: "Mae West" },
+  { text: "Live in the sunshine, swim the sea, drink the wild air.", author: "Ralph Waldo Emerson" },
+  { text: "The best way to predict the future is to invent it.", author: "Alan Kay" },
+  { text: "Don't let yesterday take up too much of today.", author: "Will Rogers" },
+  { text: "You learn more from failure than from success.", author: "Unknown" },
+  { text: "If you want to lift yourself up, lift up someone else.", author: "Booker T. Washington" },
+  { text: "A person who never made a mistake never tried anything new.", author: "Albert Einstein" },
+  { text: "We can't help everyone, but everyone can help someone.", author: "Ronald Reagan" },
+  { text: "Change your thoughts and you change your world.", author: "Norman Vincent Peale" },
+  { text: "Start where you are. Use what you have. Do what you can.", author: "Arthur Ashe" },
+  { text: "Fall seven times and stand up eight.", author: "Japanese Proverb" },
+  { text: "Everything has beauty, but not everyone can see.", author: "Confucius" },
+  { text: "How wonderful it is that nobody need wait a single moment before starting to improve the world.", author: "Anne Frank" },
+  { text: "When you reach the end of your rope, tie a knot in it and hang on.", author: "Franklin D. Roosevelt" },
+  { text: "Don't judge each day by the harvest you reap but by the seeds that you plant.", author: "Robert Louis Stevenson" },
+  { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+  { text: "Dream big and dare to fail.", author: "Norman Vaughan" },
+  { text: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle" },
+  { text: "Whoever is happy will make others happy too.", author: "Anne Frank" },
+  { text: "You will face many defeats in life, but never let yourself be defeated.", author: "Maya Angelou" },
+  { text: "The only person you are destined to become is the person you decide to be.", author: "Ralph Waldo Emerson" },
+  { text: "Go confidently in the direction of your dreams. Live the life you have imagined.", author: "Henry David Thoreau" },
+  { text: "When we strive to become better than we are, everything around us becomes better too.", author: "Paulo Coelho" },
+  { text: "Happiness is not something ready-made. It comes from your own actions.", author: "Dalai Lama" },
+  { text: "Too many of us are not living our dreams because we are living our fears.", author: "Les Brown" },
+  { text: "Limit your 'always' and your 'nevers'.", author: "Amy Poehler" },
+  { text: "Nothing is impossible, the word itself says 'I'm possible'!", author: "Audrey Hepburn" },
+  { text: "The secret of getting ahead is getting started.", author: "Mark Twain" },
+  { text: "I've missed more than 9,000 shots in my career. I've failed over and over again. And that is why I succeed.", author: "Michael Jordan" },
+  { text: "Don't count the days, make the days count.", author: "Muhammad Ali" },
+  { text: "The best revenge is massive success.", author: "Frank Sinatra" },
+  { text: "Your imagination is your preview of life's coming attractions.", author: "Albert Einstein" },
+  { text: "What we achieve inwardly will change outer reality.", author: "Plutarch" },
+  { text: "If you can dream it, you can do it.", author: "Walt Disney" },
+  { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle" },
+  { text: "The best preparation for tomorrow is doing your best today.", author: "H. Jackson Brown, Jr." },
+  { text: "Perfection is not attainable, but if we chase perfection we can catch excellence.", author: "Vince Lombardi" },
+  { text: "Life is 10% what happens to you and 90% how you react to it.", author: "Charles R. Swindoll" },
+  { text: "With the new day comes new strength and new thoughts.", author: "Eleanor Roosevelt" },
+  { text: "The pessimist sees difficulty in every opportunity. The optimist sees opportunity in every difficulty.", author: "Winston Churchill" },
+  { text: "Do what is right, not what is easy nor what is popular.", author: "Roy T. Bennett" },
+  { text: "It is never too late to be what you might have been.", author: "George Eliot" },
+  { text: "Pain is temporary. Quitting lasts forever.", author: "Lance Armstrong" },
+  { text: "One day or day one. You decide.", author: "Unknown" },
+  { text: "Small steps in the right direction can turn out to be the biggest step of your life.", author: "Unknown" },
+  { text: "Doubt kills more dreams than failure ever will.", author: "Suzy Kassem" },
+  { text: "Stay hungry, stay foolish.", author: "Steve Jobs" },
+  { text: "Make each day your masterpiece.", author: "John Wooden" },
+  { text: "Don't wait. The time will never be just right.", author: "Napoleon Hill" },
+  { text: "Be the type of person you want to meet.", author: "Unknown" },
+  { text: "Everything you want is on the other side of fear.", author: "Jack Canfield" },
+  { text: "Courage is resistance to fear, mastery of fear—not absence of fear.", author: "Mark Twain" },
+  { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
+  { text: "Success usually comes to those who are too busy to be looking for it.", author: "Henry David Thoreau" },
+  { text: "If you can't fly then run, if you can't run then walk, if you can't walk then crawl.", author: "Martin Luther King Jr." },
+  { text: "It's not whether you get knocked down, it's whether you get up.", author: "Vince Lombardi" },
+  { text: "What we do today, right now, will have an accumulated effect on all our tomorrows.", author: "Alexandra Stoddard" },
+  { text: "The only way to achieve the impossible is to believe it is possible.", author: "Charles Kingsleigh" },
+  { text: "Every moment is a fresh beginning.", author: "T.S. Eliot" },
+  { text: "Keep your face always toward the sunshine—and shadows will fall behind you.", author: "Walt Whitman" },
+  { text: "A river cuts through rock, not because of its power, but because of its persistence.", author: "James Watkins" },
+  { text: "Nothing worth having comes easy.", author: "Theodore Roosevelt" },
+  { text: "Be stubborn about your goals, and flexible about your methods.", author: "Unknown" },
+  { text: "The difference between ordinary and extraordinary is that little extra.", author: "Jimmy Johnson" },
+  { text: "Don't stop when you're tired. Stop when you're done.", author: "Unknown" },
+  { text: "Work hard in silence, let success be your noise.", author: "Frank Ocean" },
+  { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
+  { text: "Discipline is choosing between what you want now and what you want most.", author: "Abraham Lincoln" },
+  { text: "Action is the foundational key to all success.", author: "Pablo Picasso" },
+  { text: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Unknown" },
+];
+
+/**
+ * getGreeting() — Returns a daily inspirational quote based on the day of the year.
+ * Each day of the year gets a unique quote, cycling through the collection.
  */
 function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const diff = now - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  const dayOfYear = Math.floor(diff / oneDay);
+  const index = dayOfYear % DAILY_QUOTES.length;
+  const quote = DAILY_QUOTES[index];
+  return `${quote.text} — ${quote.author}`;
 }
 
 /**
